@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <script src="jq.js" type="text/javascript"></script>
+        <script src="ref.js" type="text/javascript"></script>
+        <style>
+            .cont{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column
+            }
+            .box{
+                text-align: center;
+            }
+            
+            button{
+                height : 50px;
+                width : 150px;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                var startTime;
+                var PauseTime;
+                var UnpauseTime;
+                var stopTime;
+                var PauseTotal = 0;
+                var TimeTotal;
+                var paused = false;
+                var TimePassed;
+                $("#stop").attr("disabled",true);
+                $("#pause").attr("disabled",true);
+                $("#stop").attr("disabled",true);
+                //$("#get").attr("disabled",true);
+                var TimedUpdate = setInterval(function(){
+                    if (startTime){
+                    var getTime = new Date();
+                    TimeTotal = getTime - startTime;
+                    TimeTotal -= PauseTotal;
+                    TimePassed = (Math.ceil(TimeTotal/1000));
+                    if (!paused){$("#TimePassed").html(parseInt(TimePassed/3600)+":"+parseInt((TimePassed%3600)/60)+":"+(TimePassed%3600)%60);}
+                    }
+                    
+                
+                },1000);
+                $("#start").click(function(){
+                    startTime = new Date();
+                    $("#LogTimings").append("<br>\n Start Time: "+startTime.toLocaleTimeString());
+                    $("#stop").attr("disabled",false);
+                    $("#pause").attr("disabled",false);
+                    $("#stop").attr("disabled",false);
+                    //$("#get").attr("disabled",false);
+                    $("#start").attr("disabled",true);
+                    
+
+                });
+                $("#pause").click(function(){
+                    if (!paused){
+                        paused = true;
+                        PauseTime = new Date();
+                        $("#stop").attr("disabled",true);
+                        $("#pause").html("<h3>Unpause</h3>");
+                        $("#LogTimings").append("<br>\n Pause Time: "+PauseTime.toLocaleTimeString());
+                    }else{
+                        paused = false;
+                        $("#pause").html("<h3>Pause</h3>");
+                        UnpauseTime = new Date();
+                        $("#stop").attr("disabled",false);
+                        $("#LogTimings").append("<br>\n UnPause Time: "+UnpauseTime.toLocaleTimeString());
+                        PauseTotal += UnpauseTime - PauseTime;
+                        $("#LogTimings").append("<br>\n Paused for approximately (minutes): "+parseInt(PauseTotal/60000));    
+                    }
+                });
+                /*$("#get").click(function(){
+                    console.log(TimePassed);
+                    console.log(parseInt(TimePassed/3600));
+                    console.log(parseInt(TimePassed/60));
+                    console.log((TimePassed%3600)%60);
+                    $("#TimePassed").html(parseInt(TimePassed/3600)+":"+parseInt(TimePassed/60)+":"+(TimePassed%3600)%60);
+                });*/
+                $("#stop").click(function(){
+                    stopTime = new Date();
+                    $("#stop").attr("disabled",true);
+                    $("#pause").attr("disabled",true);
+                    $("#LogTimings").append("<br>\n Stop Time: "+stopTime.toLocaleTimeString());
+                    TimeTotal = stopTime - startTime;
+                    TimeTotal -= PauseTotal;
+                    console.log(TimeTotal);
+                    TimeTotal = (Math.ceil(TimeTotal/1000));
+                    $("#LogTimings").append("<br>\n Total Time: "+parseInt(TimeTotal/3600)+":"+parseInt((TimeTotal%3600)/60)+":"+(TimeTotal%3600)%60);
+                    clearInterval(TimedUpdate);
+                });
+                
+                $("#saveLog").click(function (){
+                    if(confirm("Save log as file:"+(new Date()).toLocaleDateString())){
+                        var data = ($("#LogTimings").text()).split("\n");
+                        var saveData = "Total Time: "+   $("#TimePassed").text() +"\n"+ data.join("\n");
+                        console.log(data);
+                        var blob = new Blob([saveData],
+                        { type: "text/plain;charset=utf-8" });
+                        saveAs(blob, (new Date()).toLocaleDateString()  +".txt");
+                    }
+                });
+                
+            });
+        
+        </script>
+    </head>
+    <body>
+        <div class="cont">
+            <div class="box">
+                <h1>Time Passed:</h1>
+                <h1 id="TimePassed">0:0:0</h1>
+            </div>
+            <div class="box">
+                <button id="start"><h3>Start</h3></button>
+                <button id="pause"><h3>Pause</h3></button>
+                <button id="stop"><h3>Stop</h3></button><br>
+<!--                <button id="get"><h3>Get</h3></button><br>      -->
+            </div>
+            <div class="box">
+            <a id = "saveLog" href ="#"><h3>Save Log</h3></a><br>
+            <p id="LogTimings">Log Timings:<br></p>
+            </div>
+        </div>
+    </body>
+
+
+</html>
